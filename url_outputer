@@ -1,0 +1,17 @@
+import urllib
+
+
+class Url_outputer(object):
+    def __init__(self):
+        self.datas = []
+
+    def output(self):
+        for data in self.datas:
+            name = r'f:\cover_3\%s.jpg' % data['name']
+            urllib.urlretrieve(data['cover_src'], name)
+
+    def collect(self, data):
+        if data is None:
+            return None
+        self.datas.append(data)
+
