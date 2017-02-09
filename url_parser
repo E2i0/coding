@@ -1,0 +1,38 @@
+import re
+import urlparse
+
+from bs4 import BeautifulSoup
+
+
+
+class Url_parser(object):
+    def __init__(self):
+        self.re_url = re.compile(r'\-\d+\.html')
+    def parse(self, new_url, content):
+        if new_url is None or content is None:
+            return None
+        soup = BeautifulSoup(content, 'html.parser', from_encoding='utf-8')
+        new_urls = self._get_new_urls(new_url, soup)
+        data = self._get_data(new_url, soup)
+        return new_urls, data
+
+    def _get_new_urls(self, new_url, soup):
+        # href="http://www.nh87.cn/zhengmei/18128.html"
+        new_urls = set()
+        links = soup.find_all('a',href = self.re_url)
+        for link in links:
+            url = link['href']
+            full_url = ur'http://www.nh87.cn' + url
+            new_urls.add(full_url)
+        return new_urls
+
+    def _get_data(self, new_url, soup):
+        data = {}
+        article_node = soup.find('div', class_ = 'article')
+        name_node = article_node.find('h1')
+        cover_node = article_node.find('img')
+        data['name'] = name_node.get_text()             # get name
+        cover_src =  ur'http://www.nh87.cn' + cover_node['src']
+        data['cover_src'] = cover_src                  # get cover src
+        return data
+
